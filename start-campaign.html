@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Start a Campaign</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="auth-page">
+    <header>
+      <div class="container">
+        <h1 class="logo">Fundly</h1>
+        <nav id="main-nav"></nav>
+      </div>
+    </header>
+
+    <main class="login-container">
+      <div class="login-card" style="max-width: 620px">
+        <div class="login-body">
+          <h2>Launch Your Campaign</h2>
+          <p>Share your idea with the community and start raising funds</p>
+
+          <form id="campaignForm">
+            <div class="form-group">
+              <label for="title">Campaign Title *</label>
+              <input type="text" id="title" placeholder="e.g. Eco-Water Bottle" required  minlength="5" />
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description *</label>
+              <textarea id="description" rows="6" placeholder="Explain your project.." required minlength="20"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="goal">Funding Goal In EGP *</label>
+              <input type="number" id="goal" min="100" step="1" placeholder="5000" required />
+            </div>
+
+            <div class="form-group">
+              <label for="deadline">Deadline *</label>
+              <input type="date" id="deadline" required />
+            </div>
+
+            <div class="form-group">
+              <label for="category">Category *</label>
+              <select id="category" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="Technology">Technology</option>
+                <option value="Sustainability">Sustainability</option>
+                <option value="Music">Music</option>
+                <option value="Art">Art & Design</option>
+                <option value="Film">Film & Video</option>
+                <option value="Community">Community</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="imageFile">Upload Campaign Image</label>
+              <input type="file" id="imageFile" accept="image/*" />
+              <small>PNG, JPG — max 2MB recommended</small>
+            </div>
+
+            <div class="form-group">
+              <label for="imageUrl">Or paste Image URL</label>
+              <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg" />
+            </div>
+
+            <div style="margin: 20px 0; text-align: center">
+              <img
+                id="imagePreview"
+                src=""
+                alt="Image Preview"
+                style="
+                  max-width: 100%;
+                  max-height: 280px;
+                  border-radius: 12px;
+                  display: none;
+                  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                "
+              />
+            </div>
+
+            <button type="submit" class="submit-btn">Create Campaign →</button>
+          </form>
+
+          <p
+            class="note"
+            style="
+              margin-top: 28px;
+              text-align: center;
+              color: var(--text-muted);
+              font-size: 0.95rem;
+            "
+          >
+            Your campaign will be pending admin approval before going live
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>© 2026 Fundly. The Curated Catalyst for Change</p>
+      </div>
+    </footer>
+
+    <script src="js/auth.js" defer></script>
+
+    <script>
+      
+
+      function checkAuth() {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        if (!user) {
+          alert("You need to login first to start a campaign");
+          window.location.href = "login.html";
+          return null;
+        }
+        return user;
+      }
+
+      function updateNav() {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        const nav = document.getElementById("main-nav");
+
+        // if user is guest
+        if (!user) {
+          nav.innerHTML = `
+      <a href="index.html" class="active">Home</a>
+      <a href="#">Browse Campaigns</a>
+      <a href="login.html">Login</a>
+      <a href="register.html" class="btn btn-primary">Register</a>
+    `;
+          return;
+        }
+
+        // if user signed
+      let links = `
+    <a href="index.html">Home</a>
+    <a href="#">Browse Campaigns</a>
+    <a href="start-campaign.html">Start a Campaign</a>
+    <a href="my-campaigns.html">My Campaigns</a>
+  `;
+
+        // admin
+        if (user.role === "admin") {
+          links += `<a href="admin.html">Admin Dashboard</a>`;
+        }
+
+       // Logout
+        links += `<a href="#" onclick="logout()">Logout</a>`;
+
+        nav.innerHTML = links;
+      }
+
+      function logout() {
+        localStorage.removeItem("currentUser");
+        alert("Logged out successfully");
+        window.location.href = "index.html";
+      }
+
+
+      // validate that date in not in the past , only future 
+      function isFutureDate(dateStr) {
+        const input = new Date(dateStr);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return input > today;
+      }
+
+     
+      // Image Preview
+      document.getElementById("imageFile")?.addEventListener("change", function (e) {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          if (file.size > 2 * 1024 * 1024) {
+            alert("Image is too large (max ~2MB recommended)");
+            this.value = "";
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const preview = document.getElementById("imagePreview");
+            preview.src = ev.target.result;
+            preview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        });
+
+     
+      // Form Submit    
+      document.getElementById("campaignForm")?.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const user = checkAuth();
+          if (!user) return;
+
+          // Collect values
+          const title = document.getElementById("title").value.trim();
+          const description = document.getElementById("description").value.trim();
+          const goal = Number(document.getElementById("goal").value);
+          const deadline = document.getElementById("deadline").value;
+          const category = document.getElementById("category").value;
+
+          // Validation
+          if (title.length < 5)
+            return alert("Title must be at least 5 characters");
+          if (description.length < 20)
+            return alert("Description must be at least 20 characters");
+          if (isNaN(goal) || goal < 100)
+            return alert("Goal must be a number ≥ 100 EGP");
+          if (!isFutureDate(deadline))
+            return alert("Deadline must be a future date");
+
+          let image = document.getElementById("imageUrl").value.trim();
+
+          const fileInput = document.getElementById("imageFile");
+          if (fileInput.files?.[0]) {
+            image = await new Promise((resolve) => {
+              const r = new FileReader();
+              r.onload = () => resolve(r.result);
+              r.readAsDataURL(fileInput.files[0]);
+            });
+          }
+
+          if (!image) {
+            image = "https://via.placeholder.com/800x400?text=Campaign+Image";
+          }
+
+          const newCampaign = {
+            title,
+            description,
+            goal,
+            raised: 0,
+            deadline,
+            creatorId: user.id,
+            isApproved: false,
+            image,
+            category,
+          };
+
+          try {
+            await apiRequest("POST", "/campaigns", newCampaign);
+            alert("Campaign created successfully!\nIt is pending admin approval",
+            );
+            window.location.href = "index.html";
+          } catch (err) {
+            console.error(err);
+            alert("Failed to create campaign.\nCheck console for details");
+          }
+        });
+
+  
+      // Init
+      document.addEventListener("DOMContentLoaded", () => {
+        const user = checkAuth();
+        if (!user) return;
+
+        updateNav();
+
+        // Min date = tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById("deadline").min = tomorrow
+          .toISOString()
+          .split("T")[0];
+      });
+    </script>
+  </body>
+</html>

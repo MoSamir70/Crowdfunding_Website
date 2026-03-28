@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Campaign Details - Fundly</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+<<<<<<< HEAD
+ 
+=======
+    <!-- Reuse same header as index.html, but add conditional logic later -->
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+    <header>
+      <div class="container">
+        <h1 class="logo">Fundly</h1>
+        <nav id="main-nav">
+          <!-- JS will update this based on login -->
+        </nav>
+      </div>
+    </header>
+
+    <section class="campaign-detail container" style="padding: 140px 20px 80px">
+      <div class="detail-header">
+        <img id="campaign-image" class="main-image" src="" alt="Campaign" />
+        <div class="detail-info">
+          <h1 id="campaign-title"></h1>
+          <p id="campaign-desc"></p>
+          <div class="progress large">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+          <div class="meta large">
+            <div><strong>Goal:</strong> <span id="goal"></span> EGP</div>
+            <div><strong>Raised:</strong> <span id="raised"></span> EGP</div>
+            <div><strong>Deadline:</strong> <span id="deadline"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pledge-section">
+        <h2>Support This Project</h2>
+        <form id="pledgeForm">
+          <div class="form-group">
+            <label for="amount">Pledge Amount (EGP)</label>
+            <input
+              type="number"
+              id="amount"
+              min="1"
+              placeholder="Enter amount"
+              required
+            />
+          </div>
+          <button type="submit" class="submit-btn">Pledge Now →</button>
+        </form>
+        <p class="note">This is a mock payment — no real transaction occurs.</p>
+      </div>
+
+      <!-- Pledges list (visible to creator or admin later) -->
+      <div id="pledges-list" style="margin-top: 60px">
+        <h2>Supporters</h2>
+        <ul id="pledges-ul"></ul>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+<<<<<<< HEAD
+        <p>© 2026 Fundly. The Curated Catalyst for Change</p>
+=======
+        <p>© 2026 Fundly. The Curated Catalyst for Change.</p>
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+      </div>
+    </footer>
+
+    <script src="js/auth.js" defer></script>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const campaignId = urlParams.get("id");
+
+      // async function loadCampaign() {
+      //   if (!campaignId) {
+      //     alert("No campaign ID provided");
+      //     window.location.href = "index.html";
+      //     return;
+      //   }
+
+      //   try {
+      //     const camp = await apiRequest('GET', `/campaigns/${campaignId}`);
+      //     if (!camp || !camp.isApproved) {
+      //       alert("Campaign not found or not approved");
+      //       window.location.href = "index.html";
+      //       return;
+      //     }
+
+      //     document.getElementById('campaign-image').src = camp.image || 'https://via.placeholder.com/800x400';
+      //     document.getElementById('campaign-title').textContent = camp.title;
+      //     document.getElementById('campaign-desc').textContent = camp.description;
+      //     document.getElementById('goal').textContent = camp.goal;
+      //     document.getElementById('raised').textContent = camp.raised || 0;
+      //     document.getElementById('deadline').textContent = camp.deadline;
+
+      //     const progress = Math.min(100, ((camp.raised || 0) / camp.goal) * 100);
+      //     document.getElementById('progress-bar').style.width = progress + '%';
+
+      //   } catch (err) {
+      //     console.error(err);
+      //     alert("Failed to load campaign");
+      //   }
+      // }
+
+      async function loadCampaign() {
+        if (!campaignId) {
+          alert("No campaign ID provided");
+          window.location.href = "index.html";
+          return;
+        }
+
+        try {
+          const camp = await apiRequest("GET", `/campaigns/${campaignId}`);
+          if (!camp) {
+            alert("Campaign not found");
+            window.location.href = "index.html";
+            return;
+          }
+
+          const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+<<<<<<< HEAD
+       
+=======
+          // السماح للـ creator يشوف حملته حتى لو pending
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+          const canView =
+            camp.isApproved ||
+            (currentUser && String(currentUser.id) === String(camp.creatorId));
+
+          if (!canView) {
+            alert(
+              "This campaign is not approved yet and you are not the creator.",
+            );
+            window.location.href = "index.html";
+            return;
+          }
+
+<<<<<<< HEAD
+         
+=======
+          // عرض الحملة
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+          document.getElementById("campaign-image").src =
+            camp.image || "https://via.placeholder.com/800x400";
+          document.getElementById("campaign-title").textContent = camp.title;
+          document.getElementById("campaign-desc").textContent =
+            camp.description;
+          document.getElementById("goal").textContent = camp.goal;
+          document.getElementById("raised").textContent = camp.raised || 0;
+          document.getElementById("deadline").textContent = camp.deadline;
+
+          const progress = Math.min(
+            100,
+            ((camp.raised || 0) / camp.goal) * 100,
+          );
+          document.getElementById("progress-bar").style.width = progress + "%";
+
+<<<<<<< HEAD
+          
+=======
+          // إخفاء/إظهار الـ pledge form لو مش approved
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+          const pledgeSection = document.querySelector(".pledge-section");
+          if (pledgeSection) {
+            if (camp.isApproved) {
+              pledgeSection.style.display = "block";
+            } else {
+              pledgeSection.style.display = "none";
+<<<<<<< HEAD
+          
+=======
+              // أضف رسالة بديلة تحت الـ title أو في مكان مناسب
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+              const statusMsg = document.createElement("p");
+              statusMsg.style.color = "#f59e0b";
+              statusMsg.style.fontWeight = "600";
+              statusMsg.style.marginTop = "16px";
+              statusMsg.textContent =
+                "This campaign is pending admin approval. Pledges are disabled until approved.";
+              document.querySelector(".detail-info").appendChild(statusMsg);
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Failed to load campaign");
+        }
+      }
+
+      // Pledge form
+      document
+        .getElementById("pledgeForm")
+        ?.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const amount = parseInt(document.getElementById("amount").value);
+          if (amount < 1) return alert("Amount must be at least 1 EGP");
+
+          const user = JSON.parse(localStorage.getItem("currentUser"));
+          if (!user) return alert("Please login to pledge");
+
+          try {
+            const newPledge = {
+              campaignId: campaignId,
+              userId: user.id,
+              amount,
+            };
+            await apiRequest("POST", "/pledges", newPledge);
+
+            // Update raised (PATCH campaign)
+            const camp = await apiRequest("GET", `/campaigns/${campaignId}`);
+            await apiRequest("PATCH", `/campaigns/${campaignId}`, {
+              raised: (camp.raised || 0) + amount,
+            });
+
+            alert(`Thank you! You pledged ${amount} EGP (mock payment)`);
+            location.reload(); // refresh to show updated raised
+          } catch (err) {
+            alert("Pledge failed");
+            console.error(err);
+          }
+        });
+
+      // // Basic nav update
+      // function updateNav() {
+      //   const user = JSON.parse(localStorage.getItem('currentUser'));
+      //   const nav = document.getElementById('main-nav');
+      //   if (user) {
+      //     nav.innerHTML = `
+      //       <a href="index.html">Home</a>
+      //       <a href="#">Browse</a>
+      //       <a href="start-campaign.html">Start Campaign</a>
+      //       <a href="#">My Campaigns</a>
+      //       <a href="#" onclick="logout()">Logout</a>
+      //     `;
+      //   } else {
+      //     nav.innerHTML = `
+      //       <a href="index.html">Home</a>
+      //       <a href="#">Browse</a>
+      //       <a href="#">Start</a>
+      //       <a href="login.html">Login</a>
+      //       <a href="register.html" class="btn btn-primary">Register</a>
+      //     `;
+      //   }
+      // }
+
+      function updateNav() {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        const nav = document.getElementById("main-nav");
+
+<<<<<<< HEAD
+     
+=======
+        // لو مفيش يوزر (غير مسجل) ← حالة الزائر
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+        if (!user) {
+          nav.innerHTML = `
+      <a href="index.html" class="active">Home</a>
+      <a href="#">Browse Campaigns</a>
+      <a href="login.html">Login</a>
+      <a href="register.html" class="btn btn-primary">Register</a>
+    `;
+          return;
+        }
+
+<<<<<<< HEAD
+        
+=======
+        // لو فيه يوزر مسجل ← نبني الروابط الأساسية
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+        let links = `
+    <a href="index.html">Home</a>
+    <a href="#">Browse Campaigns</a>
+    <a href="start-campaign.html">Start a Campaign</a>
+    <a href="my-campaigns.html">My Campaigns</a>
+  `;
+
+<<<<<<< HEAD
+     
+=======
+        // إضافة رابط Admin Dashboard لو اليوزر admin
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+        if (user.role === "admin") {
+          links += `<a href="admin.html">Admin Dashboard</a>`;
+        }
+
+<<<<<<< HEAD
+     
+=======
+        // إضافة Logout في النهاية
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+        links += `<a href="#" onclick="logout()">Logout</a>`;
+
+        nav.innerHTML = links;
+      }
+
+      function logout() {
+        localStorage.removeItem("currentUser");
+        alert("Logged out");
+        window.location.href = "index.html";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        updateNav();
+        loadCampaign();
+      });
+    </script>
+  </body>
+</html>

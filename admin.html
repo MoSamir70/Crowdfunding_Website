@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Fundly</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1 class="logo">Fundly Admin</h1>
+        <nav id="main-nav"></nav>
+      </div>
+    </header>
+
+    <section class="container" style="padding: 140px 20px 80px">
+      <h1 class="section-title" style="text-align: center; margin-bottom: 48px">
+        Admin Dashboard
+      </h1>
+
+      <!-- Users Section -->
+      <div class="admin-section">
+        <h2>Users Management</h2>
+        <div id="users-list" class="campaigns-grid"></div>
+      </div>
+
+      <!-- Pending Campaigns Section -->
+      <div class="admin-section" style="margin-top: 80px">
+        <h2>Pending Campaigns Moderation</h2>
+        <div id="pending-campaigns" class="campaigns-grid"></div>
+      </div>
+
+      <div
+        id="no-pending"
+        style="
+          display: none;
+          text-align: center;
+          padding: 60px;
+          color: var(--text-muted);
+        "
+      >
+        <h3>No pending campaigns at the moment</h3>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>© 2026 Fundly Admin Panel</p>
+      </div>
+    </footer>
+
+    <script src="js/auth.js" defer></script>
+    <script>
+      // ────────────────────────────────────────────────
+      // Auth & Nav
+      // ────────────────────────────────────────────────
+      function checkAdmin() {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        if (!user || user.role !== "admin") {
+          alert("Access denied: Admins only.");
+          window.location.href = "index.html";
+          return null;
+        }
+        return user;
+      }
+
+      function updateNav() {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        const nav = document.getElementById("main-nav");
+        if (user) {
+          nav.innerHTML = `
+          <a href="index.html">Home</a>
+          <a href="admin.html" class="active">Admin Dashboard</a>
+          <a href="#" onclick="logout()">Logout</a>
+        `;
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("currentUser");
+        alert("Logged out");
+        window.location.href = "index.html";
+      }
+
+      // ────────────────────────────────────────────────
+      // Load Users
+      // ────────────────────────────────────────────────
+      async function loadUsers() {
+        try {
+          const users = await apiRequest("GET", "/users");
+          const container = document.getElementById("users-list");
+          container.innerHTML = "";
+
+          users.forEach((u) => {
+            const isAdmin = u.role === "admin";
+            const statusColor = u.isActive ? "var(--success-green)" : "#ef4444";
+            const statusText = u.isActive ? "Active" : "Banned";
+
+            const card = document.createElement("div");
+            card.className = "campaign-card";
+            card.style.minHeight = "180px";
+            card.innerHTML = `
+            <div class="card-content">
+              <h3>${u.name}</h3>
+              <p style="color: var(--text-muted);">${u.email}</p>
+              <p>Role: ${isAdmin ? "<strong>Admin</strong>" : "User"}</p>
+              <p>Status: <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span></p>
+              ${
+                !isAdmin
+                  ? `
+                <button class="submit-btn" style="margin-top: 16px; background: ${u.isActive ? "#ef4444" : "var(--success-green)"};"
+                        onclick="toggleBan('${u.id}', ${u.isActive})">
+                  ${u.isActive ? "Ban User" : "Unban User"}
+                </button>
+              `
+                  : '<p style="color: #888; margin-top: 16px;">Cannot ban admins</p>'
+              }
+            </div>
+          `;
+            container.appendChild(card);
+          });
+        } catch (err) {
+          console.error(err);
+          document.getElementById("users-list").innerHTML =
+            '<p style="color:red">Failed to load users</p>';
+        }
+      }
+
+      async function toggleBan(userId, currentActive) {
+        if (
+          !confirm(
+            `Are you sure you want to ${currentActive ? "BAN" : "UNBAN"} this user?`,
+          )
+        )
+          return;
+
+        try {
+          await apiRequest("PATCH", `/users/${userId}`, {
+            isActive: !currentActive,
+          });
+          alert(`User ${currentActive ? "banned" : "unbanned"} successfully`);
+          loadUsers(); // refresh
+        } catch (err) {
+          alert("Failed to update user status");
+          console.error(err);
+        }
+      }
+
+      // ────────────────────────────────────────────────
+      // Load Pending Campaigns
+      // ────────────────────────────────────────────────
+      async function loadPendingCampaigns() {
+        try {
+          const campaigns = await apiRequest(
+            "GET",
+            "/campaigns?isApproved=false",
+          );
+          const container = document.getElementById("pending-campaigns");
+          const noPending = document.getElementById("no-pending");
+          container.innerHTML = "";
+
+          if (campaigns.length === 0) {
+            noPending.style.display = "block";
+            return;
+          }
+
+          noPending.style.display = "none";
+
+          campaigns.forEach((c) => {
+            const card = document.createElement("div");
+            card.className = "campaign-card";
+            card.innerHTML = `
+            <img src="${c.image || "https://via.placeholder.com/400x220"}" alt="${c.title}">
+            <div class="card-content">
+              <h3>${c.title}</h3>
+              <p style="color: var(--text-muted);">${c.description.substring(0, 100)}...</p>
+              <p><strong>Creator ID:</strong> ${c.creatorId}</p>
+              <p><strong>Goal:</strong> ${c.goal} EGP</p>
+              <div style="margin: 16px 0;">
+                <button class="submit-btn" style="background: var(--success-green); margin-right: 8px;"
+                        onclick="moderateCampaign('${c.id}', true)">Approve</button>
+                <button class="submit-btn" style="background: #ef4444;"
+                        onclick="moderateCampaign('${c.id}', false)">Reject</button>
+              </div>
+            </div>
+          `;
+            container.appendChild(card);
+          });
+        } catch (err) {
+          console.error(err);
+          document.getElementById("pending-campaigns").innerHTML =
+            '<p style="color:red">Failed to load pending campaigns</p>';
+        }
+      }
+
+      async function moderateCampaign(campaignId, approve) {
+        if (
+          !confirm(
+            `Are you sure you want to ${approve ? "APPROVE" : "REJECT"} this campaign?`,
+          )
+        )
+          return;
+
+        try {
+          await apiRequest("PATCH", `/campaigns/${campaignId}`, {
+            isApproved: approve,
+          });
+          alert(`Campaign ${approve ? "approved" : "rejected"} successfully`);
+          loadPendingCampaigns(); // refresh
+        } catch (err) {
+          alert("Failed to moderate campaign");
+          console.error(err);
+        }
+      }
+
+      // ────────────────────────────────────────────────
+      // Init
+      // ────────────────────────────────────────────────
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!checkAdmin()) return;
+        updateNav();
+        loadUsers();
+        loadPendingCampaigns();
+      });
+    </script>
+  </body>
+</html>

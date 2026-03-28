@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Fundly</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="auth-page">
+    <header>
+      <div class="container">
+        <h1 class="logo">Fundly</h1>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="#">Browse</a>
+          <a href="#">Start</a>
+          <a href="#">Dashboard</a>
+          <a href="login.html" class="btn btn-primary">Login</a>
+          <a href="register.html" class="btn btn-accent">Register</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="login-container">
+      <div class="login-card">
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab">Login</div>
+          <div class="tab active">Register</div>
+        </div>
+
+        <!-- Form Content -->
+        <div class="login-body">
+          <h2>Create Your Account</h2>
+          <p>Join the curated catalyst community</p>
+
+          <button class="google-btn">
+            <img
+              src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+              alt="Google"
+              width="24"
+            />
+            Continue with Google
+          </button>
+
+          <div class="divider">
+            <span>Or use email</span>
+          </div>
+
+          <form id="registerForm">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" placeholder="Your Name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+                <!-- browser validation -->
+              <input type="email" id="email" placeholder="name@company.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div style="position: relative">
+                <input type="password" id="password" placeholder="••••••" required />
+                <span class="eye-icon" style="position: absolute; right: 16px; top: 50%;transform: translateY(-50%); cursor: pointer color: var(--text-muted);" >👁️</span>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Create Account →</button>
+          </form>
+
+          <p class="signup-link">
+            Already have an account? <a href="login.html">Login</a>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/auth.js" defer></script>
+
+    <script>
+      // Password visibility toggle
+      const eye = document.querySelector(".eye-icon");
+      const pass = document.getElementById("password");
+      
+      if (eye && pass) {
+        eye.addEventListener("click", () => {
+          if (pass.type === "password") {
+            pass.type = "text";
+            eye.textContent = "🙈";
+          } else {
+            pass.type = "password";
+            eye.textContent = "👁️";
+          }
+        });
+      }
+
+      // Register form submit
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+
+          // if any field is empty
+          if (!name || !email || !password) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          try {
+            // Check if email already exists
+            // await response from server
+            // apiRequest func from auth.js
+            const existing = await apiRequest("GET", `/users?email=${encodeURIComponent(email)}`, );
+
+            //existing = Array
+            if (existing.length > 0) {
+              alert("Email already exist");
+              return;
+            }
+
+            // Register new user
+            const newUser = {
+              name,
+              email,
+              password, // plain text for demo only
+              role: "user",
+              isActive: true,
+            };
+
+            await apiRequest("POST", "/users", newUser);
+
+            alert("Registration success, Now U can login");
+            window.location.href = "login.html";
+          } catch (err) {
+            console.error(err);
+            alert("Registration failed. try again");
+          }
+
+        });
+
+   
+    </script>
+
+    <script>
+      // Continue with Google
+      document.querySelector(".google-btn")?.addEventListener("click", function (e) {
+          e.preventDefault();
+          alert("Google Sign-In is a mock",);
+        });
+
+      // Forgot Password link
+      document
+        .querySelector(".forgot")
+        ?.addEventListener("click", function (e) {
+          e.preventDefault();
+          alert(
+            "Password reset is a mock",
+          );
+        });
+
+      // "Create one" / "Login" links
+      document
+        .querySelectorAll(".signup-link a, .login-link a")
+        ?.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            // No preventDefault here because we want the href to work
+            console.log("Navigating to: " + this.getAttribute("href"));
+            
+          });
+        });
+
+      // Make login/register tabs clickable
+      document.querySelectorAll(".tab")?.forEach((tab) => {
+        tab.addEventListener("click", function () {
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) => t.classList.remove("active"));  // Remove active from all tabs
+          this.classList.add("active"); // Add active to clicked tab
+
+          //  Redirect to clicked page
+          if (this.textContent.trim() === "Login") {
+            window.location.href = "login.html";
+          } else if (this.textContent.trim() === "Register") {
+            window.location.href = "register.html";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+    <title>Fundly Platform</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <h1 class="logo">Fundly</h1>
+
+        <!-- <nav>
+        <a href="index.html" class="active">Home</a>
+        <a href="#">Browse Campaigns</a>
+        <a href="#">Start a Campaign</a>
+        <a href="login.html">Login</a>
+        <a href="register.html" class="btn btn-primary">Register</a>
+        </nav> -->
+
+        <nav id="main-nav">
+          <!-- automaic fill using Js UpdateNav Function -->
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container">
+        <h2>Fund the Next Big Idea</h2>
+        <p>Join a community that turns dreams into reality</p>
+        <a href="#" class="btn btn-accent">Browse Campaigns</a>
+      </div>
+    </section>
+
+    <section class="featured">
+      <div class="container">
+        <h2 class="section-title">Featured Campaigns</h2>
+        <div id="campaigns-list" class="campaigns-grid"></div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>© 2026 Fundly. The Curated Catalyst for Change</p>
+      </div>
+    </footer>
+
+    <script src="js/campaigns.js" defer></script>
+
+    <script>
+      function updateNav() {
+
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        const nav = document.getElementById("main-nav");
+
+        // if user is guest / not signed
+        if (!user) {
+          nav.innerHTML = ` <a href="index.html" class="active">Home</a>
+                            <a href="#">Browse Campaigns</a>
+                            <a href="login.html">Login</a>
+                            <a href="register.html" class="btn btn-primary">Register</a> `;
+          return;
+        }
+
+        // if user is signed
+        let links = ` <a href="index.html">Home</a>
+                      <a href="#">Browse Campaigns</a>
+                      <a href="start-campaign.html">Start a Campaign</a>
+                      <a href="my-campaigns.html">My Campaigns</a>`;
+
+        // admin user
+        if (user.role === "admin") {
+          links += `<a href="admin.html">Admin Dashboard</a>`;
+        }
+
+        // Logout
+        links += `<a href="#" onclick="logout()">Logout</a>`;
+
+        nav.innerHTML = links;
+      }
+
+      function logout() {
+        localStorage.removeItem("currentUser"); // remove user data
+        alert("Logged out successfully");
+        window.location.href = "index.html"; // back to home
+      }
+
+      // load the page then do updateNav
+      document.addEventListener("DOMContentLoaded", () => { updateNav(); });
+    </script>
+  </body>
+</html>

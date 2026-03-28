@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Campaigns - Fundly</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1 class="logo">Fundly</h1>
+        <nav id="main-nav"></nav>
+      </div>
+    </header>
+
+    <section class="container" style="padding: 140px 20px 80px">
+      <h1 class="section-title" style="text-align: left; margin-bottom: 40px">
+        My Campaigns
+      </h1>
+
+      <div id="campaigns-container" class="campaigns-grid"></div>
+
+      <div
+        id="no-campaigns"
+        style="
+          display: none;
+          text-align: center;
+          padding: 80px 20px;
+          color: var(--text-muted);
+        "
+      >
+        <h2 style="color: var(--primary-navy); margin-bottom: 16px">
+          You haven't created any campaigns yet
+        </h2>
+        <p style="margin-bottom: 32px">
+          Turn your idea into reality — start fundraising today!
+        </p>
+        <a
+          href="start-campaign.html"
+          class="btn btn-accent"
+          style="padding: 16px 40px; font-size: 1.1rem"
+        >
+          Start a Campaign →
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>© 2026 Fundly. The Curated Catalyst for Change.</p>
+      </div>
+    </footer>
+
+    <script src="js/auth.js" defer></script>
+    <script>
+<<<<<<< HEAD
+ 
+      // Navigation & Auth
+    
+=======
+      // ────────────────────────────────────────────────
+      // Navigation & Auth
+      // ────────────────────────────────────────────────
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+
+      function updateNav() {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        const nav = document.getElementById("main-nav");
+
+<<<<<<< HEAD
+=======
+        // لو مفيش يوزر (غير مسجل) ← حالة الزائر
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+        if (!user) {
+          nav.innerHTML = `
+      <a href="index.html" class="active">Home</a>
+      <a href="#">Browse Campaigns</a>
+      <a href="login.html">Login</a>
+      <a href="register.html" class="btn btn-primary">Register</a>
+    `;
+          return;
+        }
+
+<<<<<<< HEAD
+        
+=======
+        // لو فيه يوزر مسجل ← نبني الروابط الأساسية
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+        let links = `
+    <a href="index.html">Home</a>
+    <a href="#">Browse Campaigns</a>
+    <a href="start-campaign.html">Start a Campaign</a>
+    <a href="my-campaigns.html">My Campaigns</a>
+  `;
+
+<<<<<<< HEAD
+
+        if (user.role === "admin") {
+          links += `<a href="admin.html">Admin Dashboard</a>`;
+        }
+
+       
+        links += `<a href="#" onclick="logout()">Logout</a>`;
+
+=======
+        // إضافة رابط Admin Dashboard لو اليوزر admin
+        if (user.role === "admin") {
+          links += `<a href="admin.html">Admin Dashboard</a>`;
+        }
+
+        // إضافة Logout في النهاية
+        links += `<a href="#" onclick="logout()">Logout</a>`;
+
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+        nav.innerHTML = links;
+      }
+      function logout() {
+        localStorage.removeItem("currentUser");
+        alert("Logged out successfully");
+        window.location.href = "index.html";
+      }
+
+<<<<<<< HEAD
+      // Load My Campaigns
+      
+=======
+      // ────────────────────────────────────────────────
+      // Load My Campaigns
+      // ────────────────────────────────────────────────
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+      async function loadMyCampaigns() {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        const container = document.getElementById("campaigns-container");
+        const noCampaigns = document.getElementById("no-campaigns");
+
+        try {
+          //   const campaigns = await apiRequest('GET', `/campaigns?creatorId=${user.id}`);
+
+<<<<<<< HEAD
+          // temp frontend get data
+=======
+          // مؤقتًا: جيب كل الحملات وفلتر في الـ frontend
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+          const all = await apiRequest("GET", "/campaigns");
+          const campaigns = all.filter(
+            (c) => String(c.creatorId) === String(user.id),
+          );
+
+          container.innerHTML = "";
+
+          if (campaigns.length === 0) {
+            noCampaigns.style.display = "block";
+            return;
+          }
+
+          noCampaigns.style.display = "none";
+
+          campaigns.forEach((camp) => {
+            const progress = Math.min(
+              100,
+              ((camp.raised || 0) / camp.goal) * 100,
+            );
+            const statusText =
+              camp.isApproved === true
+                ? '<span style="color: var(--success-green); font-weight: 600;">Approved</span>'
+                : camp.isApproved === false
+                  ? '<span style="color: #f59e0b; font-weight: 600;">Pending Approval</span>'
+                  : '<span style="color: #ef4444; font-weight: 600;">Rejected</span>';
+
+            const card = document.createElement("div");
+            card.className = "campaign-card";
+            card.innerHTML = `
+            <img src="${camp.image || "https://via.placeholder.com/400x220?text=" + encodeURIComponent(camp.title)}" 
+                 alt="${camp.title}" style="height: 200px; object-fit: cover;">
+            <div class="card-content">
+              <h3>${camp.title}</h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+                ${camp.description.substring(0, 100)}${camp.description.length > 100 ? "..." : ""}
+              </p>
+              <div class="progress">
+                <div class="progress-bar" style="width: ${progress}%; background: var(--success-green);"></div>
+              </div>
+              <div class="meta" style="display: flex; justify-content: space-between; margin: 12px 0;">
+                <span>Goal: ${camp.goal} EGP</span>
+                <span>Raised: ${camp.raised || 0} EGP</span>
+              </div>
+              <div class="meta" style="margin-bottom: 16px;">
+                <span>Deadline: ${camp.deadline}</span>
+              </div>
+              <div style="margin-bottom: 16px; font-size: 0.95rem;">
+                Status: ${statusText}
+              </div>
+              <a href="campaign-detail.html?id=${camp.id}" class="btn btn-primary small">
+                View Details →
+              </a>
+            </div>
+          `;
+
+            container.appendChild(card);
+          });
+        } catch (err) {
+          console.error(err);
+          container.innerHTML = `<p style="color: red; text-align: center;">Error loading your campaigns. Please try again later.</p>`;
+        }
+      }
+
+<<<<<<< HEAD
+ 
+      // Init
+     
+=======
+      // ────────────────────────────────────────────────
+      // Init
+      // ────────────────────────────────────────────────
+>>>>>>> 13034d76890a4c0affec7346a4a6dd2e27deb9d3
+      document.addEventListener("DOMContentLoaded", () => {
+        updateNav();
+        loadMyCampaigns();
+      });
+    </script>
+  </body>
+</html>

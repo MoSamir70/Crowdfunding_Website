@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="auth-page">
+
+    <header>
+      <div class="container">
+        <h1 class="logo">Fundly</h1>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="#">Browse</a>
+          <a href="#">Start</a>
+          <a href="#">Dashboard</a>
+          <a href="login.html" class="btn btn-primary">Login</a>
+          <a href="register.html" class="btn btn-accent">Register</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="login-container">
+      <div class="login-card">
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab active">Login</div>
+          <div class="tab">Register</div>
+        </div>
+
+        <!-- Form Content -->
+        <div class="login-body">
+          <h2>Welcome Back</h2>
+          <p>Continue your journey as a curated catalyst</p>
+
+          <button class="google-btn">
+            <img
+              src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+              alt="Google"
+              width="24"
+            />
+            Continue with Google
+          </button>
+
+          <div class="divider">
+            <span>Or use email</span>
+          </div>
+
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="name@gmail.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div style="position: relative">
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="••••••"
+                  required
+                />
+                <span
+                  class="eye-icon"
+                  style="
+                    position: absolute;
+                    right: 16px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    color: var(--text-muted);
+                  "
+                  >👁️</span
+                >
+              </div>
+              <a href="#" class="forgot">Forgot?</a>
+            </div>
+
+            <button type="submit" class="submit-btn"> Login → </button>
+          </form>
+
+          <p class="signup-link">
+            Don't have an account? <a href="register.html">Create one</a>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/auth.js" defer></script>
+
+    <script>
+      // Password visibility toggle
+      const eye = document.querySelector(".eye-icon");
+      const pass = document.getElementById("password");
+
+      if (eye && pass) {
+        eye.addEventListener("click", () => {
+          if (pass.type === "password") {
+            pass.type = "text";
+            eye.textContent = "🙈";
+          } else {
+            pass.type = "password";
+            eye.textContent = "👁️";
+          }
+        });
+      }
+
+      // Form submit
+      document.getElementById("loginForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        loginUser(email, password); // loginUser func from auth.js
+      });
+    </script>
+
+    <script>
+      // Continue with Google
+      document
+        .querySelector(".google-btn")
+        ?.addEventListener("click", function (e) { // ?. = optional chaining
+          e.preventDefault();
+          alert(
+            "Google Sign-In is a mock authentication",
+          );
+        });
+
+      // Forgot Password link
+      document
+        .querySelector(".forgot")
+        ?.addEventListener("click", function (e) {
+          e.preventDefault();
+          alert(
+            "Password reset is a mock authentication",
+          );
+        });
+
+      // Create one btn
+      document
+        .querySelectorAll(".signup-link a, .login-link a")
+        ?.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            // No preventDefault coz we want the href to work
+            console.log("Navigating to: " + this.getAttribute("href"));
+    
+          });
+        });
+
+      // Make login/register tabs clickable
+      document.querySelectorAll(".tab")?.forEach((tab) => {
+        tab.addEventListener("click", function () {
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) => t.classList.remove("active")); // Remove active from all tabs
+          this.classList.add("active");     // Add active to clicked tab
+
+          // Redirect to clicked page
+          if (this.textContent.trim() === "Login") { window.location.href = "login.html";
+          } else if (this.textContent.trim() === "Register") { window.location.href = "register.html";}
+        });
+      });
+
+    </script>
+  </body>
+</html>
