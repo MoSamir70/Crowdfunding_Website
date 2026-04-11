@@ -106,4 +106,8 @@ Created as part of Client Side 2 course – ITI Zagazig
 
 ```
 
+## Contributors
+
+- Mo Samir (MoSamir70)
 ```
+
